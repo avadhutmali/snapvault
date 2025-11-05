@@ -1,13 +1,10 @@
 package snapvault.backend.Core;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class Diff {
     
     public static SnapshotDiff findChanges(Map<String,String> oldHash , Map<String,String> newHash){
-        List<String> changes = new ArrayList<>();
 
         SnapshotDiff snapshotDiff = new SnapshotDiff();
 

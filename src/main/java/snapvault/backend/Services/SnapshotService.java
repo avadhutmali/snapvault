@@ -3,6 +3,7 @@ package snapvault.backend.Services;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import snapvault.backend.Core.Diff;
 import snapvault.backend.Core.DirectoryScanner;
 import snapvault.backend.Core.ObjectStore;
 import snapvault.backend.Core.SnapshotDiff;
+import snapvault.backend.DTOs.FileMetadataResponseDTO;
+import snapvault.backend.DTOs.SnapshotResponseDTO;
 import snapvault.backend.Models.FileMetadata;
 import snapvault.backend.Models.SnapVault;
 import snapvault.backend.Repositories.FileMetadataRepository;
@@ -88,6 +91,30 @@ public class SnapshotService {
         }
         return LastSnapShotHashes;
         
+    }
+
+    public List<SnapshotResponseDTO> getAllSnapShots(){
+
+        List<SnapshotResponseDTO> list = new ArrayList<>();
+
+        for(SnapVault snap : snapshotRepository.findAll()){
+            list.add(new SnapshotResponseDTO(snap.getId(),snap.getSnapShotName(),snap.getSnapshotTimestamp()));
+        }
+        return list;
+    }
+
+    public List<FileMetadataResponseDTO> getSnapShotFiles(Long snapShotId){
+        List<FileMetadataResponseDTO> list = new ArrayList<>();
+        Optional<SnapVault> snap = snapshotRepository.findById(snapShotId);
+        if(snap.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        for(FileMetadata data : fileMetadataRepository.findBySnapVault(snap.get())){
+            list.add(new FileMetadataResponseDTO(data.getOriginalPath(), data.getHash(), data.getSize()));
+        }
+
+        return list;
     }
 
 

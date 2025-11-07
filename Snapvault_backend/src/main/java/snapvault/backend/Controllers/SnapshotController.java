@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import snapvault.backend.DTOs.FileMetadataResponseDTO;
+import snapvault.backend.DTOs.RestoreRequestDTO;
 import snapvault.backend.DTOs.SnapshotRequest;
 import snapvault.backend.DTOs.SnapshotResponseDTO;
 import snapvault.backend.Services.SnapshotService;
@@ -25,8 +26,6 @@ public class SnapshotController {
 
     @PostMapping
     public ResponseEntity<String> createSnapShot(@RequestBody SnapshotRequest request){
-        System.out.println(request.getDirectoryPath());
-        System.out.println(request.getSnapShotName());
         try{
             snapshotService.createSnapshot(request.getDirectoryPath(), request.getSnapShotName());
             return ResponseEntity.ok("Snapshot created succesfully");
@@ -43,5 +42,16 @@ public class SnapshotController {
     @GetMapping("/{id}")
     public List<FileMetadataResponseDTO> getSnapShotFiles(@PathVariable Long id){
         return snapshotService.getSnapShotFiles(id);
+    }
+
+    @PostMapping("/{snapShotId}/restore")
+    public ResponseEntity<String> restoreSnapShot(@PathVariable Long snapShotId, @RequestBody RestoreRequestDTO request){
+        try{
+            snapshotService.restoreSnapShot(snapShotId, request.getRestorePath());
+            return ResponseEntity.ok("Snapshot restored Succesfully");
+        }
+        catch(Exception e){
+            return ResponseEntity.status(500).body("Error in restoring snapshot :"+e.getMessage());
+        }
     }
 }

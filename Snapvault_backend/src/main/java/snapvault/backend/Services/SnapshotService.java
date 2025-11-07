@@ -31,8 +31,6 @@ public class SnapshotService {
     private final FileMetadataRepository fileMetadataRepository;
     private final ObjectStore objectStore = new ObjectStore();
 
-    private DirectoryScanner directoryScanner = new DirectoryScanner();
-
     public void createSnapshot(String directoryPath, String snapshotName) throws IOException, NoSuchAlgorithmException{
         
         Map<String ,String> oldHashes = getLastSnapshotHashes();
@@ -115,6 +113,19 @@ public class SnapshotService {
         }
 
         return list;
+    }
+
+    public void restoreSnapShot(Long snapShotId, String restorePath) throws IOException{
+        Optional<SnapVault> snapVault = snapshotRepository.findById(snapShotId);
+
+        if(snapVault.isEmpty())throw new RuntimeException("Snapshot not Found InvalidID");
+
+        List<FileMetadata> files = fileMetadataRepository.findBySnapVault(snapVault.get());
+
+        for(FileMetadata data : files){
+            String originalPath = restorePath+"/"+data.getOriginalPath();
+            objectStore.restoreFileHelper(originalPath, data.getHash());
+        }
     }
 
 

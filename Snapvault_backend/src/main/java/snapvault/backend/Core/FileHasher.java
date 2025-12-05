@@ -10,11 +10,9 @@ public class FileHasher {
     public static String generateFileHash(String filePath) throws IOException,NoSuchAlgorithmException{
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
             byte contents[] = Files.readAllBytes(Paths.get(filePath));
 
             byte[] hash = digest.digest(contents);
-
             StringBuilder hexHash = new StringBuilder();
 
             for(byte b : hash){

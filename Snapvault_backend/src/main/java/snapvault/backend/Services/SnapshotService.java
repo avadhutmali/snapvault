@@ -1,21 +1,16 @@
 package snapvault.backend.Services;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import snapvault.backend.Core.Diff;
-import snapvault.backend.Core.DirectoryScanner;
-import snapvault.backend.Core.ObjectStore;
-import snapvault.backend.Core.SnapshotDiff;
+import snapvault.backend.Core.*;
 import snapvault.backend.DTOs.FileMetadataResponseDTO;
 import snapvault.backend.DTOs.SnapshotResponseDTO;
 import snapvault.backend.Models.FileMetadata;
@@ -34,8 +29,9 @@ public class SnapshotService {
     public void createSnapshot(String directoryPath, String snapshotName) throws IOException, NoSuchAlgorithmException{
         
         Map<String ,String> oldHashes = getLastSnapshotHashes();
+        List<Path> paths = DirectoryScanner.directoryScanner(directoryPath);
+        Map<String ,String> newHashes = getSnapShotHash(paths,directoryPath);
 
-        Map<String , String > newHashes = DirectoryScanner.directoryScanner(directoryPath);
 
         SnapshotDiff snapshotDiff = Diff.findChanges(oldHashes, newHashes);
 
@@ -49,14 +45,14 @@ public class SnapshotService {
 
         //Modified
         if(snapshotDiff.getModified().isEmpty())System.out.println("No Modified files");
-        else for(String s:snapshotDiff.getAdded()){
+        else for(String s:snapshotDiff.getModified()){
             objectStore.storeFile(directoryPath+"/"+s, newHashes.get(s));
         }
 
         //Deleted
         if(snapshotDiff.getDeleted().isEmpty())System.out.println("No files Deleted");
         else for(String s:snapshotDiff.getDeleted()){
-            objectStore.storeFile(directoryPath+"/"+s, newHashes.get(s));
+            System.out.println("File Deleted are "+s);
         }
 
         //create snapvault
@@ -90,6 +86,15 @@ public class SnapshotService {
         return LastSnapShotHashes;
         
     }
+    private Map<String,String> getSnapShotHash(List<Path> paths,String DirectoryPath) throws IOException, NoSuchAlgorithmException {
+        Map<String,String> map = new HashMap<>();
+        for(Path path : paths){
+            String relativePath = Paths.get(DirectoryPath).relativize(path).toString();
+            String hash = FileHasher.generateFileHash(path.toString());
+            map.put(relativePath,hash);
+        }
+        return map;
+    }
 
     public List<SnapshotResponseDTO> getAllSnapShots(){
 
@@ -107,7 +112,6 @@ public class SnapshotService {
         if(snap.isEmpty()){
             return new ArrayList<>();
         }
-
         for(FileMetadata data : fileMetadataRepository.findBySnapVault(snap.get())){
             list.add(new FileMetadataResponseDTO(data.getOriginalPath(), data.getHash(), data.getSize()));
         }
@@ -119,7 +123,6 @@ public class SnapshotService {
         Optional<SnapVault> snapVault = snapshotRepository.findById(snapShotId);
 
         if(snapVault.isEmpty())throw new RuntimeException("Snapshot not Found InvalidID");
-
         List<FileMetadata> files = fileMetadataRepository.findBySnapVault(snapVault.get());
 
         for(FileMetadata data : files){

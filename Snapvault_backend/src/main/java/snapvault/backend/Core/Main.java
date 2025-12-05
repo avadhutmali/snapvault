@@ -8,9 +8,12 @@ public class Main {
         String path1 = "test_v1";
         String path2 = "test_v2";
 
-        var oldHash = DirectoryScanner.directoryScanner(path1);
-        var newHash = DirectoryScanner.directoryScanner(path2);
-        
+        var oldPaths = DirectoryScanner.directoryScanner(path1);
+        var newPaths = DirectoryScanner.directoryScanner(path2);
+
+        var oldHash = DirectoryScanner.getSnapShotHash(oldPaths,path1);
+        var newHash = DirectoryScanner.getSnapShotHash(newPaths,path2);
+
         SnapshotDiff diff = Diff.findChanges(oldHash, newHash);
 
         ObjectStore objectStore = new ObjectStore();

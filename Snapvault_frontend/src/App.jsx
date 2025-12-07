@@ -15,8 +15,8 @@ function App() {
   
   // MODAL STATES
   const [showAddModal, setShowAddModal] = useState(false); 
-  const [showScanModal, setShowScanModal] = useState(false); // <--- NEW: Controls the Commit Modal
-  const [commitMessage, setCommitMessage] = useState("");    // <--- NEW: Stores the message
+  const [showScanModal, setShowScanModal] = useState(false); 
+  const [commitMessage, setCommitMessage] = useState(""); 
 
   const fetchData = async () => {
     try {
@@ -54,7 +54,7 @@ function App() {
 
   // 1. OPEN THE MODAL (Don't scan yet)
   const openScanModal = () => {
-      setCommitMessage(""); // Reset message
+      setCommitMessage(""); 
       setShowScanModal(true);
   };
 

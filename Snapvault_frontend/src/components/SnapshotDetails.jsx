@@ -31,13 +31,9 @@ function SnapshotDetails({ snapshotId }) {
     setRestoringFiles(prev => ({ ...prev, [file.originalPath]: 'loading' }));
     
     try {
-        // 2. Call the Backend
-        // Note: Ideally, we ask the user WHERE to restore. 
-        // For now, let's restore to the original path (Overwrite) or a 'Restored' folder.
-        // Let's assume the backend handles the logic or we send a generic path.
         
         const payload = {
-            restorePath: "D:/Restored_Files" // <--- HARDCODED FOR DEMO (Or ask user)
+            restorePath: "D:/Restored_Files" // <--- HARDCODED FOR DEMO
         };
 
         await axios.post(`http://localhost:8080/api/v1/snapshots/${snapshotId}/restore`, payload);

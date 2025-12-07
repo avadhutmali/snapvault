@@ -6,7 +6,7 @@ function SnapshotList({ onSelectSnapshot }) {
   const [snapshots, setSnapshots] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Function to fetch data from Spring Boot
+  // fetch data from Spring Boot
   const fetchSnapshots = async () => {
     setLoading(true);
     try {

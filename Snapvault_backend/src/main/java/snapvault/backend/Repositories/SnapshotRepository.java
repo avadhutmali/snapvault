@@ -9,6 +9,7 @@ import snapvault.backend.Models.SnapVault;
 public interface  SnapshotRepository extends JpaRepository<SnapVault, Long>{
 
     // Map<String, String> getLastSnapshotHashes();
+    Optional<SnapVault> findFirstByDirectoryPathOrderBySnapshotTimestampDesc(String directoryPath);
     Optional<SnapVault> findFirstByOrderBySnapshotTimestampDesc();
     
 }

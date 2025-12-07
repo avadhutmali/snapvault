@@ -12,4 +12,6 @@ public class SnapshotResponseDTO {
     private Long id;
     private String snapShotName;
     private LocalDateTime localDateTime;
+    private String directoryPath;
+    private String projectName;
 }

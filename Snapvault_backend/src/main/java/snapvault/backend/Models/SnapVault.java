@@ -17,5 +17,19 @@ public class SnapVault {
     private Long id;
     
     private String snapShotName;
+    private String projectName;
     private LocalDateTime snapshotTimestamp;
+    private String directoryPath;
+
+    public String getDirectoryPath() {
+        return directoryPath;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
 }

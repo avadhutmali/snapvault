@@ -6,4 +6,5 @@ import lombok.Data;
 public class SnapshotRequest {
     private String directoryPath;
     private String snapShotName;
+    private String projectName;
 }

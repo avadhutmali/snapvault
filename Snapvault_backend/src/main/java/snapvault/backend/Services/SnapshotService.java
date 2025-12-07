@@ -1,5 +1,6 @@
 package snapvault.backend.Services;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +27,7 @@ public class SnapshotService {
     private final FileMetadataRepository fileMetadataRepository;
     private final ObjectStore objectStore = new ObjectStore();
 
-    public void createSnapshot(String directoryPath, String snapshotName) throws IOException, NoSuchAlgorithmException{
+    public void createSnapshot(String directoryPath, String snapshotName, String projectName) throws IOException, NoSuchAlgorithmException{
         
         Map<String ,String> oldHashes = getLastSnapshotHashes();
         List<Path> paths = DirectoryScanner.directoryScanner(directoryPath);
@@ -57,8 +58,20 @@ public class SnapshotService {
 
         //create snapvault
         snapVault.setSnapShotName(snapshotName);
+        snapVault.setDirectoryPath(directoryPath);
+        if (projectName == null || projectName.isEmpty()) {
+            Optional<SnapVault> previous = snapshotRepository.findFirstByDirectoryPathOrderBySnapshotTimestampDesc(directoryPath);
+            if (previous.isPresent()) {
+                snapVault.setProjectName(previous.get().getProjectName());
+            } else {
+                snapVault.setProjectName(new File(directoryPath).getName()); // Fallback to Folder Name
+            }
+        } else {
+            snapVault.setProjectName(projectName);
+        }
         snapVault.setSnapshotTimestamp(LocalDateTime.now());
         snapVault = snapshotRepository.save(snapVault);
+
 
         //create metadata
         for(String key : newHashes.keySet()){
@@ -101,7 +114,7 @@ public class SnapshotService {
         List<SnapshotResponseDTO> list = new ArrayList<>();
 
         for(SnapVault snap : snapshotRepository.findAll()){
-            list.add(new SnapshotResponseDTO(snap.getId(),snap.getSnapShotName(),snap.getSnapshotTimestamp()));
+            list.add(new SnapshotResponseDTO(snap.getId(),snap.getSnapShotName(),snap.getSnapshotTimestamp(),snap.getDirectoryPath(),snap.getProjectName()));
         }
         return list;
     }
